@@ -1,10 +1,14 @@
-from flask import Flask 
+from flask import Flask
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 import pickle
 
 # Initialize the Flask application
-application = Flask(__name__) 
+application = Flask(__name__)
+
+@application.route('/')
+def home():
+    return 'Fake News Classifier is running!'
 
 # Model loading
 loaded_model = None
@@ -15,18 +19,13 @@ vectorizer = None
 with open('count_vectorizer.pkl', 'rb') as vd:
     vectorizer = pickle.load(vd)
 
-# Prediction
-prediction = loaded_model.predict(vectorizer.transform(['This is fake news']))[0]
-
-# Output will be 'FAKE' if fake, 'REAL' if real
-if prediction == 1:
-    print("FAKE")
-else:
-    print("REAL")
+@application.route('/predict')
+def predict():
+    prediction = loaded_model.predict(vectorizer.transform(['This is fake news']))[0]
+    return 'FAKE' if prediction == 1 else 'REAL'
 
 # Start the Flask app
 if __name__ == '__main__':
-    # In this simple example, there is no Flask route to handle requests
-    # Just add this line to follow the structure in Figure 12
-    application.run()
+    application.run(host='0.0.0.0', port=8080)
+
 
