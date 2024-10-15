@@ -8,7 +8,7 @@ from datetime import datetime
 def run_performance_test(url, test_case, output_csv):
     times = []
     
-    # Open the CSV file and set up the writer (overwrite on each run)
+    # Open the CSV file and set up the writer
     with open(output_csv, 'w', newline='') as f:
         writer = csv.writer(f)
         # Write the header with timestamps and latency
@@ -31,12 +31,13 @@ def run_performance_test(url, test_case, output_csv):
             # Write the call number, timestamp, and latency to the CSV
             writer.writerow([i + 1, timestamp, latency])
 
-    # Return the list of times for analysis
+    # Return the list of times (latency values) for further analysis
     return times
 
-# Function to create boxplots for the results
-def create_boxplot(csv_files, output_image):
+# Function to create boxplots and calculate the average performance, with annotations
+def create_boxplot_and_calculate_average(csv_files, output_image):
     data = []
+    averages = []
     
     # Read data from each CSV file
     for file in csv_files:
@@ -47,15 +48,28 @@ def create_boxplot(csv_files, output_image):
             for row in reader:
                 times.append(float(row[2]))  # Latency is in the 3rd column
         data.append(times)
+        
+        # Calculate and print the average latency for each test case
+        average_latency = sum(times) / len(times)
+        averages.append(average_latency)
+        print(f"Average latency for {file}: {average_latency:.5f} seconds")
     
     # Generate the boxplot
-    plt.boxplot(data)
-    plt.xticks([1, 2, 3, 4], ['Test Case 1', 'Test Case 2', 'Test Case 3', 'Test Case 4'])
-    plt.ylabel('Latency (seconds)')
-    plt.title('API Latency Performance for Test Cases')
+    fig, ax = plt.subplots()
+    ax.boxplot(data)
+    ax.set_xticklabels(['Test Case 1', 'Test Case 2', 'Test Case 3', 'Test Case 4'])
+    ax.set_ylabel('Latency (seconds)')
+    ax.set_title('API Latency Performance for Test Cases')
+    
+    # Annotate the plot with the average latencies
+    for i, avg in enumerate(averages, 1):
+        ax.text(i, max(data[i-1]), f'Avg: {avg:.5f}s', horizontalalignment='center', fontsize=10, color='blue')
     
     # Save the boxplot as an image file
     plt.savefig(output_image)
+
+    # Return the calculated averages for further use or display
+    return averages
 
 # Main function to run the performance tests
 if __name__ == '__main__':
@@ -78,8 +92,12 @@ if __name__ == '__main__':
         run_performance_test(base_url, test_case, csv_file)
         csv_files.append(csv_file)
     
-    # Generate the boxplot for all test cases
-    create_boxplot(csv_files, 'boxplots/api_latency_boxplot.png')
+    # Generate the boxplot and calculate average latency
+    averages = create_boxplot_and_calculate_average(csv_files, 'boxplots/api_latency_boxplot.png')
+
+    # Print the average latencies for all test cases
+    for i, avg in enumerate(averages, 1):
+        print(f"Test Case {i} Average Latency: {avg:.5f} seconds")
 
     # Print completion message
-    print("Performance tests completed and boxplot generated.")
+    print("Performance tests completed, averages calculated, and boxplot generated.")
