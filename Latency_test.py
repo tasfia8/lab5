@@ -2,31 +2,35 @@ import requests
 import time
 import csv
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # Function to perform latency testing
 def run_performance_test(url, test_case, output_csv):
     times = []
     
-    # Perform 100 API calls
-    for i in range(100):
-        start = time.time()  # Record start time
-        response = requests.get(f'{url}?text={test_case}')
-        end = time.time()  # Record end time
-        
-        # Record the time taken for the request
-        latency = end - start
-        times.append(latency)
-        
-        # Print and log each result for debugging
-        print(f"API Call {i + 1}: {response.status_code} - Latency: {latency:.5f}s")
-    
-    # Save the results to a CSV file
-    with open(output_csv, 'w') as f:
+    # Open the CSV file and set up the writer (overwrite on each run)
+    with open(output_csv, 'w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['Call Number', 'Time Taken (seconds)'])
-        for i, t in enumerate(times):
-            writer.writerow([i + 1, t])
-    
+        # Write the header with timestamps and latency
+        writer.writerow(['Call Number', 'Timestamp', 'Time Taken (seconds)'])
+        
+        # Perform 100 API calls
+        for i in range(100):
+            start = time.time()  # Record start time in seconds
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')  # Record current timestamp
+            response = requests.get(f'{url}?text={test_case}')
+            end = time.time()  # Record end time
+            
+            # Record the time taken for the request (latency)
+            latency = end - start
+            times.append(latency)
+            
+            # Log the API call details
+            print(f"API Call {i + 1}: {response.status_code} - Timestamp: {timestamp} - Latency: {latency:.5f}s")
+            
+            # Write the call number, timestamp, and latency to the CSV
+            writer.writerow([i + 1, timestamp, latency])
+
     # Return the list of times for analysis
     return times
 
@@ -41,7 +45,7 @@ def create_boxplot(csv_files, output_image):
             reader = csv.reader(f)
             next(reader)  # Skip header
             for row in reader:
-                times.append(float(row[1]))
+                times.append(float(row[2]))  # Latency is in the 3rd column
         data.append(times)
     
     # Generate the boxplot
@@ -55,8 +59,8 @@ def create_boxplot(csv_files, output_image):
 
 # Main function to run the performance tests
 if __name__ == '__main__':
-    # Define the base URL for the API
-    base_url = 'http://localhost:8080/predict'  # Change this to the AWS server URL if needed
+    # Define the base URL for the API (can be AWS Elastic Beanstalk URL or localhost)
+    base_url = 'http://localhost:8080/predict'  # Use your Elastic Beanstalk URL if needed
     
     # Define the test cases (two fake news, two real news)
     test_cases = [
