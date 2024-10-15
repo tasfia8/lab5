@@ -73,8 +73,8 @@ def create_boxplot_and_calculate_average(csv_files, output_image):
 
 # Main function to run the performance tests
 if __name__ == '__main__':
-    # Define the base URL for the API (can be AWS Elastic Beanstalk URL or localhost)
-    base_url = 'http://localhost:8080/predict'  # Use your Elastic Beanstalk URL if needed
+    # Update the base URL for AWS Elastic Beanstalk
+    base_url = 'http://serve3-env.eba-pnvmffii.ca-central-1.elasticbeanstalk.com/'
     
     # Define the test cases (two fake news, two real news)
     test_cases = [
