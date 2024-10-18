@@ -14,8 +14,8 @@ In another terminal:
 download flask, scikit then
 pip install gunicorn
 
-(env) tasfiaislam@Tasfias-MBP ~/Desktop/ECE444/Labs/Lab5/Lab5vscode/lab5 % python -m pytest
+(env) tasfia/Lab5vscode/lab5 % python -m pytest
 
-(env) tasfiaislam@Tasfias-MBP ~/Desktop/ECE444/Labs/Lab5/Lab5vscode/lab5 % python -m unittest tests.Unit_test
+(env) tasfia/Lab5vscode/lab5 % python -m unittest tests.Unit_test
 
-(env) tasfiaislam@Tasfias-MBP ~/Desktop/ECE444/Labs/Lab5/Lab5vscode/lab5 % python Latency_test.py   
+(env) tasfia/Lab5vscode/lab5 % python Latency_test.py   
